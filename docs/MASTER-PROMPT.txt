@@ -1,0 +1,889 @@
+# MASTER PROMPT – MINI HRM SAAS
+## Full-Stack HRM, Attendance & Payroll Platform
+**Version:** 1.0  
+**Target:** Vietnam SMB (5–30 employees)  
+**Development Environment:** Windows 10, VS Code / Codex  
+**Production:** Ubuntu VPS + Nginx + PHP 8.3 + MySQL 8  
+**Languages:** Vietnamese UI, English code and documentation
+
+---
+
+# 1. ROLE & MISSION
+
+You are a senior software architect, full-stack engineer, Android engineer, UI/UX designer, database architect, security engineer, QA engineer and DevOps specialist.
+
+Your mission is to design, implement, test and deliver a production-oriented, multi-tenant SaaS platform named **Mini HRM**.
+
+The system consists of:
+
+1. SaaS Super Admin Web Portal.
+2. Company Admin Web Portal.
+3. Employee Android Application.
+4. REST API Backend.
+5. MySQL Database.
+6. Attendance and Payroll Calculation Engine.
+7. SaaS Subscription and Billing System.
+8. Background Jobs and Notifications.
+9. Automated Tests and Deployment Documentation.
+
+**Do not deliver only mockups, pseudocode, empty pages or placeholder implementations.**
+
+Build a functional application with real database persistence, authentication, authorization, business rules, API integration and meaningful test coverage.
+
+When a third-party service requires credentials, implement the integration interface, configuration, safe fallback and setup instructions. Never invent credentials or claim an external integration is operational without testing it.
+
+---
+
+# 2. TECHNOLOGY STACK
+
+Use the following technology stack unless a compelling technical incompatibility is discovered.
+
+## Backend
+- PHP 8.3
+- CodeIgniter 4
+- MySQL 8
+- Redis for caching and background queues
+- RESTful JSON API
+- JWT or secure token-based authentication
+- Role-based access control
+- OpenAPI 3 documentation
+- PHPUnit tests
+- Database migrations and seeders
+
+## Web Frontend
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui or equivalent accessible component library
+- TanStack Query
+- React Router
+- React Hook Form
+- Zod
+- Recharts
+- Lucide icons
+
+## Android
+- Kotlin
+- Jetpack Compose
+- Material 3
+- MVVM
+- Hilt
+- Retrofit
+- Room
+- WorkManager
+- Firebase Cloud Messaging (optional until configured)
+
+## Infrastructure
+- Ubuntu VPS
+- Nginx
+- PHP-FPM
+- MySQL
+- Redis
+- HTTPS
+- Cron / background workers
+- GitHub Actions for CI
+
+Do not introduce microservices, Kubernetes, Elasticsearch or other infrastructure without a demonstrated need.
+
+---
+
+# 3. MONOREPO STRUCTURE
+
+Create a clean repository:
+
+mini-hrm/
+- backend/
+- web/
+- android/
+- database/
+- docs/
+- scripts/
+- infrastructure/
+- tests/
+- README.md
+- .env.example
+
+The backend must remain a modular monolith with clear domain boundaries.
+
+Required backend modules:
+
+- Auth
+- Tenants
+- Employees
+- Departments
+- Branches
+- Shifts
+- Scheduling
+- Attendance
+- Timesheets
+- Leave
+- Payroll
+- Salary Advances
+- Reports
+- Notifications
+- Subscriptions
+- Billing
+- Audit
+- System Administration
+
+Use consistent naming conventions, DTOs, validation, services, repositories where appropriate, and centralized exception handling.
+
+---
+
+# 4. PRODUCT DESIGN & UI/UX
+
+Build a polished, responsive Vietnamese SaaS interface.
+
+Visual direction:
+
+- Modern enterprise SaaS.
+- White and light gray backgrounds.
+- Dark navy sidebar.
+- Primary blue: #2563EB.
+- Success green: #16A34A.
+- Warning amber: #F59E0B.
+- Error red: #DC2626.
+- Rounded cards.
+- Subtle shadows.
+- Clear typography.
+- Responsive layouts.
+- Consistent spacing.
+- Accessible forms and navigation.
+
+The UI should follow the provided reference mockup where possible, while prioritizing functional usability.
+
+## Web layout
+
+Desktop:
+- Fixed collapsible sidebar.
+- Top navigation.
+- Breadcrumbs.
+- Main content area.
+- Search and filters.
+- Data tables.
+- Modals and drawers.
+- Toast notifications.
+- Loading skeletons.
+- Empty states.
+- Error states.
+
+Mobile web:
+- Responsive navigation.
+- Compact cards.
+- Scrollable tables where needed.
+- Touch-friendly controls.
+
+Every menu item must open a working page. Avoid decorative buttons that perform no action.
+
+---
+
+# 5. SAAS SUPER ADMIN
+
+Create a separate Super Admin portal.
+
+Super Admin must never be treated as an ordinary company administrator.
+
+Features:
+
+## Dashboard
+- Total registered companies.
+- Active subscriptions.
+- Trial companies.
+- Paying companies.
+- Monthly recurring revenue.
+- Subscription cancellations.
+- Active users.
+- Platform usage.
+
+## Tenant Management
+- Create company.
+- View company details.
+- Suspend / reactivate company.
+- Configure subscription.
+- View usage.
+- Set employee limits.
+- Manage trial expiration.
+
+## Plan Management
+
+Initial plans:
+
+Free:
+- 5 employees.
+- Basic attendance.
+- Basic timesheets.
+
+Starter:
+- 99,000 VND/month.
+- 10 employees.
+- Payroll.
+- Excel export.
+
+Business:
+- 199,000 VND/month.
+- 30 employees.
+- Advanced scheduling.
+- GPS attendance.
+- Leave management.
+
+Pro:
+- 399,000 VND/month.
+- 60 employees.
+- Multiple branches.
+- Advanced reports.
+
+Plan prices, limits and feature entitlements must be database-configurable.
+
+## Billing
+- Subscription invoices.
+- Payment records.
+- Renewal dates.
+- Expiration notifications.
+- Payment status.
+- Manual payment verification.
+
+Implement a payment provider abstraction.
+
+Do not mark subscriptions as paid based solely on client-side callbacks.
+
+## System Settings
+- Global configuration.
+- Email settings.
+- Notification settings.
+- Maintenance mode.
+- Audit log.
+- Platform health.
+
+---
+
+# 6. COMPANY REGISTRATION & ONBOARDING
+
+A new business owner can register a company.
+
+Required workflow:
+
+1. Register account.
+2. Verify email.
+3. Create company.
+4. Choose business type.
+5. Set company name and timezone.
+6. Configure working days.
+7. Create first branch.
+8. Configure default shift.
+9. Configure payroll period.
+10. Invite employees.
+11. Open dashboard.
+
+The onboarding wizard should be simple enough for a small business owner to complete in approximately 15 minutes for a basic setup.
+
+Supported business types:
+- Retail shop.
+- Cafe.
+- Restaurant.
+- Office.
+- Service business.
+- Construction team.
+- Other.
+
+Business type should initialize recommended defaults, not hard-code payroll policy.
+
+---
+
+# 7. COMPANY ADMIN DASHBOARD
+
+Display:
+
+- Total employees.
+- Employees scheduled today.
+- Checked-in employees.
+- Late employees.
+- Absent employees.
+- Employees on leave.
+- Pending attendance corrections.
+- Pending leave requests.
+- Estimated payroll.
+- Attendance trend.
+- Employee distribution.
+
+Add quick actions:
+- Add employee.
+- Create shift.
+- View attendance.
+- Review requests.
+- Calculate payroll.
+- Export report.
+
+All dashboard statistics must be calculated from real tenant-scoped data.
+
+---
+
+# 8. EMPLOYEE MANAGEMENT
+
+Employee fields:
+
+- Employee ID.
+- Full name.
+- Avatar.
+- Phone number.
+- Email.
+- Date of birth (optional).
+- Employee code.
+- Department.
+- Branch.
+- Job title.
+- Employment type.
+- Hire date.
+- Employment status.
+- Salary policy.
+- Emergency contact (optional).
+- Notes.
+
+Employment types:
+- Full-time.
+- Part-time.
+- Hourly.
+- Daily.
+- Contract.
+
+Features:
+- CRUD employees.
+- Bulk Excel import.
+- Excel export.
+- Search and filtering.
+- Employee profile.
+- Account invitation.
+- Activation/deactivation.
+- Employment history.
+- Role assignment.
+
+Employee deletion must preserve historical payroll and attendance records when required for legitimate retention and accounting purposes.
+
+Use soft deletion or archival where appropriate.
+
+---
+
+# 9. DEPARTMENTS & BRANCHES
+
+Departments:
+- Create/edit/archive.
+- Assign managers.
+- Assign employees.
+
+Branches:
+- Name.
+- Address.
+- Latitude/longitude.
+- Allowed attendance radius.
+- Timezone.
+- Attendance policy.
+- Wi-Fi configuration.
+- Active status.
+
+Employees may belong to one primary branch and be assigned temporarily to another.
+
+Managers may only access authorized branches.
+
+---
+
+# 10. SHIFT MANAGEMENT
+
+Support:
+
+- Fixed shifts.
+- Rotating shifts.
+- Split shifts.
+- Overnight shifts.
+- Flexible shifts.
+- Part-time shifts.
+
+Shift configuration:
+- Start time.
+- End time.
+- Break duration.
+- Paid/unpaid breaks.
+- Grace period.
+- Earliest check-in.
+- Latest check-out.
+- Overtime eligibility.
+- Applicable working days.
+- Effective dates.
+
+Features:
+- Weekly scheduling.
+- Monthly scheduling.
+- Bulk assignment.
+- Copy previous week.
+- Shift templates.
+- Shift swapping with approval.
+- Conflict detection.
+- Calendar view.
+
+Correctly handle shifts crossing midnight and daylight-saving changes where applicable.
+
+Store timestamps in UTC and preserve business timezone for payroll interpretation.
+
+---
+
+# 11. ANDROID ATTENDANCE
+
+Build a real Android application.
+
+## Authentication
+- Login.
+- Logout.
+- Token refresh.
+- Forgot password.
+- Secure credential storage.
+
+## Home
+- Employee name.
+- Company.
+- Current date/time.
+- Today's shift.
+- Attendance status.
+- Check-in button.
+- Check-out button.
+- Recent attendance.
+
+## Check-in / Check-out
+- Record server-verified time.
+- Capture location only when enabled and permitted.
+- Check allowed radius.
+- Apply attendance policy.
+- Show success or failure.
+- Prevent accidental duplicate submissions.
+- Display current session.
+
+## GPS attendance
+- Request location permission contextually.
+- Support Android approximate/precise location behavior.
+- Explain why location is required.
+- Detect mock-location indicators where available.
+- Never claim GPS spoofing can be eliminated completely.
+- Avoid continuous background tracking.
+
+## Wi-Fi attendance
+- Implement policy-compatible Wi-Fi validation.
+- Respect Android version restrictions.
+- Do not assume SSID alone is a secure proof of presence.
+- Provide alternative attendance methods.
+
+## Offline mode
+- Queue attendance attempts locally.
+- Record local timestamp and device metadata.
+- Synchronize through WorkManager.
+- Use idempotency keys.
+- Flag offline records for server verification.
+- Do not silently treat an unverified offline attempt as approved attendance.
+
+## Additional screens
+- Work schedule.
+- Attendance history.
+- Timesheets.
+- Leave requests.
+- Salary advances.
+- Payslips.
+- Notifications.
+- Profile.
+- Settings.
+
+---
+
+# 12. ATTENDANCE ENGINE
+
+Attendance states:
+- Present.
+- Late.
+- Early leave.
+- Absent.
+- On leave.
+- Holiday.
+- Missing check-out.
+- Pending verification.
+- Pending correction.
+
+Implement:
+
+- Shift matching.
+- Late arrival calculation.
+- Early departure calculation.
+- Worked minutes.
+- Break deduction.
+- Overtime candidates.
+- Overnight shifts.
+- Multiple attendance events.
+- Duplicate detection.
+- Manual corrections.
+- Approval workflow.
+- Audit trail.
+
+Never calculate payroll directly from raw mobile events without normalization and approval rules.
+
+Create a timesheet aggregation service.
+
+Timesheet workflow:
+
+Raw Events → Validation → Daily Timesheet → Manager Review → Approved Timesheet → Payroll Input.
+
+Every correction must record:
+- Original value.
+- New value.
+- Reason.
+- Actor.
+- Timestamp.
+- Approval status.
+
+---
+
+# 13. LEAVE MANAGEMENT
+
+Support:
+- Annual leave.
+- Unpaid leave.
+- Sick leave.
+- Personal leave.
+- Custom leave types.
+
+Features:
+- Leave request.
+- Date range.
+- Half-day support.
+- Reason.
+- Approval.
+- Rejection.
+- Leave balance.
+- Leave history.
+- Calendar display.
+- Notifications.
+
+Leave entitlement and carryover must be configurable by company policy, subject to applicable labor rules.
+
+Do not hard-code statutory entitlements without effective-date-aware legal configuration.
+
+---
+
+# 14. PAYROLL ENGINE – CRITICAL MODULE
+
+This module must be deterministic, auditable and heavily tested.
+
+Support:
+- Monthly salary.
+- Daily salary.
+- Hourly salary.
+- Part-time salary.
+- Fixed allowances.
+- Variable allowances.
+- Overtime.
+- Bonuses.
+- Salary advances.
+- Deductions.
+- Unpaid leave.
+- Paid leave.
+- Custom payroll components.
+
+Payroll periods:
+- Monthly.
+- Custom start/end dates.
+
+Payroll workflow:
+
+Draft → Calculate → Review → Approve → Lock → Publish Payslips.
+
+Once locked, payroll records must not be silently modified.
+
+Corrections require a controlled adjustment or recalculation workflow with full audit history.
+
+## Calculation principles
+
+Use decimal arithmetic or integer minor currency units.
+
+Never use binary floating-point for money.
+
+Separate:
+- Gross earnings.
+- Employee deductions.
+- Employer costs.
+- Statutory deductions.
+- Advances.
+- Net payable.
+
+Store calculation inputs, policy version and detailed output components.
+
+Provide a payroll breakdown explaining how each amount was calculated.
+
+Example:
+
+Basic salary: 8,000,000 VND
+Allowance: 500,000 VND
+Overtime: 750,000 VND
+Advance: 1,000,000 VND
+Other deduction: 200,000 VND
+
+Illustrative net before statutory deductions:
+8,050,000 VND.
+
+This is a sample calculation, not a legally complete Vietnamese payroll calculation.
+
+## Vietnam payroll compliance
+
+Design configurable, effective-date-versioned modules for:
+- Statutory overtime rules.
+- Minimum wage references.
+- Social insurance.
+- Health insurance.
+- Unemployment insurance.
+- Personal income tax.
+- Applicable exemptions and deductions.
+
+Do not invent legal rates or hard-code unverified 2026 values.
+
+Where statutory compliance has not been implemented and verified, clearly label the payroll result as a non-statutory estimate and prevent the system from presenting it as legally complete.
+
+Create a compliance checklist and a separate legal-rules configuration layer.
+
+---
+
+# 15. PAYROLL UI
+
+Web payroll features:
+
+- Select payroll period.
+- Select branch.
+- Select department.
+- Generate payroll draft.
+- View calculation breakdown.
+- Review warnings.
+- Edit approved adjustment items.
+- Recalculate.
+- Approve.
+- Lock.
+- Publish payslips.
+- Export Excel.
+- Export PDF.
+
+Payroll table columns:
+- Employee.
+- Basic salary.
+- Workdays/hours.
+- Overtime.
+- Allowances.
+- Bonuses.
+- Advances.
+- Deductions.
+- Gross salary.
+- Net payable.
+- Status.
+
+Employees must only view their own payslips.
+
+Managers must not automatically gain access to sensitive payroll information unless explicitly authorized.
+
+---
+
+# 16. REPORTING
+
+Required reports:
+- Daily attendance.
+- Monthly timesheets.
+- Late arrivals.
+- Absences.
+- Overtime.
+- Leave balances.
+- Payroll summary.
+- Salary advances.
+- Department payroll.
+- Branch payroll.
+- Subscription usage.
+
+Filters:
+- Date range.
+- Employee.
+- Department.
+- Branch.
+- Status.
+
+Exports:
+- XLSX.
+- PDF.
+- CSV where appropriate.
+
+Exports must respect tenant boundaries and role permissions.
+
+---
+
+# 17. MULTI-TENANT SECURITY
+
+Use shared database, shared schema with tenant isolation.
+
+Every tenant-owned table must include tenant_id or have an explicitly documented, safely enforced ownership relationship.
+
+Implement:
+- Tenant context middleware.
+- Tenant-scoped repositories/queries.
+- Object-level authorization.
+- Role and permission checks.
+- Secure password hashing.
+- Login rate limiting.
+- Token rotation/revocation.
+- CSRF protection where applicable.
+- XSS protection.
+- SQL injection prevention.
+- Input validation.
+- Secure file upload.
+- Secrets management.
+- Audit logging.
+
+Never trust tenant_id supplied by the client.
+
+Resolve tenant context from authenticated and authorized membership.
+
+Super Admin access must be isolated and audited.
+
+Create automated tests that attempt cross-tenant access to:
+- Employees.
+- Attendance.
+- Timesheets.
+- Payroll.
+- Payslips.
+- Reports.
+- Files.
+- Branches.
+
+All such unauthorized requests must fail.
+
+---
+
+# 18. DATA PRIVACY
+
+Implement privacy-by-design.
+
+Requirements:
+- Data minimization.
+- Purpose limitation.
+- Role-based access.
+- Encryption in transit.
+- Encryption at rest for appropriate sensitive fields.
+- Configurable retention.
+- Privacy notices.
+- Account/data access workflows.
+- Export requests.
+- Deletion/anonymization workflows where lawful.
+- Audit trails.
+
+Location information must only be collected when necessary for the attendance policy.
+
+Do not implement continuous employee surveillance.
+
+Do not implement biometric recognition in the initial MVP.
+
+Prepare documentation for review against applicable Vietnamese personal data protection legislation.
+
+---
+
+# 19. SUBSCRIPTION ENGINE
+
+Support:
+- Free plan.
+- Paid plans.
+- Trial.
+- Upgrade.
+- Downgrade.
+- Renewal.
+- Expiration.
+- Cancellation.
+- Grace period.
+- Employee count limits.
+- Feature entitlements.
+
+Subscription enforcement must occur in backend services, not only the frontend.
+
+When a plan expires:
+- Preserve company data.
+- Allow appropriate read-only access.
+- Block premium operations as configured.
+- Display renewal options.
+- Never delete payroll history merely because payment expired.
+
+---
+
+# 20. NOTIFICATIONS
+
+Implement:
+- Email notifications.
+- In-app notifications.
+- Android push notification adapter.
+
+Events:
+- Employee invitation.
+- Leave request.
+- Leave approval/rejection.
+- Attendance correction.
+- Missing check-out.
+- Payroll published.
+- Subscription expiration.
+
+Notifications must be queued, retryable and idempotent.
+
+Never include full sensitive salary details in push notification payloads.
+
+---
+
+# 21. API DESIGN
+
+Use versioned endpoints under /api/v1.
+
+Example resources:
+
+/auth
+/tenants
+/employees
+/departments
+/branches
+/shifts
+/schedules
+/attendance
+/timesheets
+/leave-requests
+/payroll-periods
+/payslips
+/reports
+/subscriptions
+/invoices
+/notifications
+
+Use consistent:
+- HTTP status codes.
+- Error responses.
+- Pagination.
+- Filtering.
+- Sorting.
+- Validation messages.
+- Idempotency keys for critical mutations.
+
+Generate OpenAPI documentation and sample requests.
+
+---
+
+# 22. DATABASE DESIGN
+
+Create proper migrations, indexes and foreign keys.
+
+Core entities:
+- tenants
+- users
+- tenant_memberships
+- roles
+- permissions
+- branches
+- departments
+- employees
+- shifts
+- shift_assignments
+- attendance_events
+- attendance_corrections
+- timesheets
+- leave_types
+- leave_requests
+- salary_policies
+- salary_policy

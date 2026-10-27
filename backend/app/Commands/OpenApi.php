@@ -1,0 +1,37 @@
+<?php
+namespace App\Commands;
+use CodeIgniter\CLI\{BaseCommand,CLI};
+use App\Domain\Schema;
+final class OpenApi extends BaseCommand
+{
+    protected $group='MiniHRM';protected $name='hrm:openapi';protected $description='Generate OpenAPI 3.0 contract from resource definitions.';
+    public function run(array $params)
+    {
+        $paths=[];$schemas=[];$responses=['200'=>['description'=>'Success'],'401'=>['description'=>'Authentication required'],'403'=>['description'=>'Forbidden'],'404'=>['description'=>'Object not found within authorized scope'],'409'=>['description'=>'Workflow or duplicate conflict'],'422'=>['description'=>'Validation error']];
+        foreach(Schema::RESOURCES as $r=>$fields){$properties=['id'=>['type'=>'integer']];$required=[];
+            foreach($fields as $key=>$type){if(str_ends_with($type,'!'))$required[]=$key;$type=rtrim($type,'!');$properties[$key]=match(true){in_array($type,['int','money'])||str_starts_with($type,'ref:')=>['type'=>'integer','minimum'=>0],$type==='json'=>['type'=>'object','additionalProperties'=>true],$type==='decimal'=>['type'=>'number'],default=>['type'=>'string']};if($type==='date')$properties[$key]['format']='date';}
+            $schemas[$r]=['type'=>'object','properties'=>$properties,'required'=>$required];
+            $paths['/'.$r]=['get'=>['summary'=>'List tenant-scoped '.$r,'tags'=>[$r],'parameters'=>[['in'=>'query','name'=>'page','schema'=>['type'=>'integer','default'=>1]],['in'=>'query','name'=>'limit','schema'=>['type'=>'integer','maximum'=>200]],['in'=>'query','name'=>'search','schema'=>['type'=>'string']],['in'=>'query','name'=>'from','schema'=>['type'=>'string','format'=>'date']],['in'=>'query','name'=>'to','schema'=>['type'=>'string','format'=>'date']]],'responses'=>$responses]];
+            if(!in_array($r,['attendance','timesheets','payslips','notifications','files']))$paths['/'.$r]['post']=['summary'=>'Create '.$r,'tags'=>[$r],'requestBody'=>['required'=>true,'content'=>['application/json'=>['schema'=>['$ref'=>'#/components/schemas/'.$r]]]],'responses'=>['201'=>['description'=>'Created']]+$responses];
+            $paths['/'.$r.'/{id}']=['parameters'=>[['in'=>'path','name'=>'id','required'=>true,'schema'=>['type'=>'integer']]],'get'=>['summary'=>'Get authorized object','tags'=>[$r],'responses'=>$responses],'patch'=>['summary'=>'Update editable object; immutable resources reject direct updates','tags'=>[$r],'requestBody'=>['content'=>['application/json'=>['schema'=>['$ref'=>'#/components/schemas/'.$r]]]],'responses'=>$responses],'delete'=>['summary'=>'Archive archival resources only','tags'=>[$r],'responses'=>$responses]];
+        }
+        $special=['auth/login','auth/register','auth/refresh','auth/logout','auth/forgot','auth/verify','auth/reset','onboarding','attendance/attempt','schedules/bulk','timesheets/aggregate','imports','files/upload','billing/renew','billing/change-plan','billing/cancel','billing/webhook','super/payments','push-device','super/plans','super/tenants','super/settings'];
+        foreach($special as $path)$paths['/'.$path]['post']=['summary'=>$path,'requestBody'=>['content'=>['application/json'=>['schema'=>['type'=>'object','additionalProperties'=>true]]]],'responses'=>$responses];
+        foreach(['dashboard','mobile-home','schema','settings','memberships','subscriptions','plans','billing','audit','health','super/dashboard','super/tenants','super/plans','super/invoices','super/payments','super/subscriptions','super/settings','super/audit','super/health'] as $p)$paths['/'.$p]['get']=['summary'=>$p,'responses'=>$responses];
+        foreach(['attendance','timesheets','attendance-corrections','leave-requests','salary-advances','payroll-adjustments','shift-swaps','privacy-requests'] as $r)foreach(['approve','reject'] as $a)$paths['/'.$r.'/{id}/'.$a]=['parameters'=>[['in'=>'path','name'=>'id','required'=>true,'schema'=>['type'=>'integer']]],'post'=>['summary'=>'Authorized '.$a.' '.$r,'responses'=>$responses]];
+        foreach(['calculate','review','approve','lock','publish'] as $a)$paths['/payroll-periods/{id}/'.$a]=['parameters'=>[['in'=>'path','name'=>'id','required'=>true,'schema'=>['type'=>'integer']]],'post'=>['summary'=>'Payroll workflow: '.$a,'responses'=>$responses]];
+        $idParam=[['in'=>'path','name'=>'id','required'=>true,'schema'=>['type'=>'integer']]];
+        foreach(['invite','activate','deactivate','avatar'] as $a)$paths['/employees/{id}/'.$a]=['parameters'=>$idParam,'post'=>['summary'=>'Personnel action: '.$a,'requestBody'=>['content'=>['application/json'=>['schema'=>['type'=>'object','additionalProperties'=>true]]]],'responses'=>$responses]];
+        foreach(['employees/{id}/history','files/{id}/download','privacy-requests/{id}/download'] as $p)$paths['/'.$p]=['parameters'=>$idParam,'get'=>['summary'=>$p,'responses'=>$responses]];
+        foreach(['settings','memberships'] as $p)$paths['/'.$p]['patch']=['summary'=>'Update authorized '.$p,'requestBody'=>['content'=>['application/json'=>['schema'=>['type'=>'object','additionalProperties'=>true]]]],'responses'=>$responses];
+        $paths['/imports/template']['get']=['summary'=>'Download employee XLSX headers','responses'=>$responses];
+        $paths['/notifications/{id}/read']=['parameters'=>$idParam,'post'=>['summary'=>'Mark own notification read','responses'=>$responses]];
+        $paths['/super/tenants/{id}']=['parameters'=>$idParam,'get'=>['summary'=>'Company usage and subscription (platform only)','responses'=>$responses]];
+        foreach(['suspend','reactivate','subscription'] as $a)$paths['/super/tenants/{id}/'.$a]=['parameters'=>$idParam,'post'=>['summary'=>'Platform tenant action: '.$a,'requestBody'=>['content'=>['application/json'=>['schema'=>['type'=>'object','additionalProperties'=>true]]]],'responses'=>$responses]];
+        $paths['/super/plans/{id}']=['parameters'=>$idParam,'post'=>['summary'=>'Update configurable plan','requestBody'=>['content'=>['application/json'=>['schema'=>['type'=>'object','additionalProperties'=>true]]]],'responses'=>$responses]];
+        foreach(['employees','timesheets','payslips','daily-attendance','monthly-timesheets','late-arrivals','absences','overtime','leave-balances','payroll-summary','salary-advances','department-payroll','branch-payroll','subscription-usage'] as $report){$paths['/exports/'.$report]['get']=['summary'=>'Authorized export '.$report,'parameters'=>[['in'=>'query','name'=>'format','schema'=>['type'=>'string','enum'=>['xlsx','pdf','csv']]]],'responses'=>$responses];if(!isset(Schema::RESOURCES[$report]))$paths['/reports/'.$report]['get']=['summary'=>$report,'responses'=>$responses];}
+        foreach(['auth/login','auth/register','auth/refresh','auth/forgot','auth/verify','auth/reset','billing/webhook','health'] as $p)foreach($paths['/'.$p] as &$op)if(is_array($op))$op['security']=[];unset($op);
+        $spec=['openapi'=>'3.0.3','info'=>['title'=>'Mini HRM API','version'=>'1.0.0','description'=>'Bearer authentication; tenant resolved from membership. All money uses integer VND. Payroll is a non-statutory estimate. See docs/API.md for workflow payloads.'],'servers'=>[['url'=>'/api/v1']],'security'=>[['bearerAuth'=>[]]],'paths'=>$paths,'components'=>['securitySchemes'=>['bearerAuth'=>['type'=>'http','scheme'=>'bearer']],'schemas'=>$schemas]];
+        $dest=ROOTPATH.'../docs/openapi.json';file_put_contents($dest,json_encode($spec,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));CLI::write('Generated docs/openapi.json');
+    }
+}

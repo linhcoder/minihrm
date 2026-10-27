@@ -1,0 +1,16 @@
+.tools/
+node_modules/
+web/dist/
+backend/vendor/
+backend/writable/*
+!backend/writable/.htaccess
+backend/.env
+.env
+android/.gradle/
+android/local.properties
+android/**/build/
+*.log
+backend/build/
+web/*.tsbuildinfo
+android/.kotlin/
+tests/results/*.xlsx

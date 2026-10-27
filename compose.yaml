@@ -1,0 +1,50 @@
+name: minihrm
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: minihrm
+      MYSQL_USER: minihrm
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}
+    volumes: [mysql-data:/var/lib/mysql]
+    healthcheck:
+      test: [CMD-SHELL, 'mysqladmin ping -h localhost -u root -p"$$MYSQL_ROOT_PASSWORD" --silent']
+      interval: 10s
+      retries: 12
+    restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    command: [redis-server, --appendonly, 'yes', --requirepass, '${REDIS_PASSWORD:?Set REDIS_PASSWORD}']
+    volumes: [redis-data:/data]
+    restart: unless-stopped
+  php:
+    build: {context: ., dockerfile: infrastructure/php.Dockerfile}
+    env_file: [.env]
+    environment:
+      CI_ENVIRONMENT: production
+      database_default_hostname: mysql
+    volumes: [writable:/var/www/hrm/backend/writable]
+    depends_on:
+      mysql: {condition: service_healthy}
+      redis: {condition: service_started}
+    restart: unless-stopped
+  web:
+    build: {context: ., dockerfile: infrastructure/web.Dockerfile}
+    ports: ['127.0.0.1:8088:80']
+    depends_on: [php]
+    restart: unless-stopped
+  worker:
+    build: {context: ., dockerfile: infrastructure/php.Dockerfile}
+    env_file: [.env]
+    environment: {CI_ENVIRONMENT: production}
+    volumes: [writable:/var/www/hrm/backend/writable]
+    command: [sh, -c, 'while true; do php spark hrm:work; php spark hrm:mail; sleep 15; done']
+    depends_on:
+      mysql: {condition: service_healthy}
+      redis: {condition: service_started}
+    restart: unless-stopped
+volumes:
+  mysql-data:
+  redis-data:
+  writable:

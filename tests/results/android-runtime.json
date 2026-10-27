@@ -1,0 +1,12 @@
+{
+  "device": "Android emulator API 35",
+  "apkInstalled": true,
+  "login": true,
+  "sessionRestoredAfterRestart": true,
+  "ownSchedule": true,
+  "ownProfile": true,
+  "offlineRoomQueue": true,
+  "workManagerResync": "pending_verification",
+  "coldStartAfterIOFixMs": 5682,
+  "physicalGpsWifiVerified": false
+}

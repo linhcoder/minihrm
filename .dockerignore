@@ -1,0 +1,10 @@
+.git
+.tools
+**/node_modules
+**/vendor
+**/build
+web/dist
+backend/.env
+backend/writable/*
+android
+.env
