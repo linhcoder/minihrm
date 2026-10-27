@@ -33,7 +33,7 @@ final class Workflow
             }
             if ($r==='attendance'&&$approve) {
                 if (empty($v['verified_at'])||empty($v['reason'])) throw new Problem(422,'Cần giờ UTC đã xác minh và lý do.');
-                try { $dt=new \DateTimeImmutable($v['verified_at']); } catch (\Throwable) { throw new Problem(422,'Giờ xác minh không hợp lệ.'); }
+                try { $dt=new \DateTimeImmutable(DateFormat::instant($v['verified_at'])); } catch (\Throwable) { throw new Problem(422,'Giờ xác minh không hợp lệ. Sử dụng dd/mm/yyyy HH:mm:ss.'); }
                 $schedule=$this->s->find('schedules',(int)$row['schedule_id']);$this->assertNoLockedPayroll((int)$row['employee_id'],$schedule['work_date']);
                 $this->s->update($r,$id,['occurred_at'=>$dt->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d\TH:i:s\Z'),'status'=>'verified']);
                 (new AttendanceEngine($this->s))->aggregate($schedule); return $this->s->find($r,$id);

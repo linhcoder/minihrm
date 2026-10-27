@@ -1,5 +1,7 @@
 # API guide
 
+Current behavior: all companies have full feature access without package limits or expiry. Human-facing date/time uses dd/MM/yyyy HH:mm:ss (UTC+7). See [current access/date policy](UNLIMITED-ACCESS-AND-DATES.md).
+
 The generated [OpenAPI 3.0 contract](openapi.json) is produced with `php backend/spark hrm:openapi`. All endpoints are under `/api/v1`, accept JSON and use `Authorization: Bearer <access_token>` unless listed as public. Dates are ISO `YYYY-MM-DD`, UTC timestamps use ISO 8601, and money is integer VND.
 
 ## Authentication and onboarding
@@ -21,7 +23,7 @@ POST /api/v1/onboarding
 {"name":"Công ty An Nhiên","business_type":"office","timezone":"Asia/Ho_Chi_Minh","working_days":[1,2,3,4,5,6],"branch_name":"Trụ sở","address":"TP. Hồ Chí Minh","start_time":"08:00","end_time":"17:00","payroll_day":1}
 ```
 
-Login returns access/refresh tokens and expiry. `GET /auth/me` returns the authenticated user, resolved tenant and membership. Logout revokes the current session. `/auth/forgot` always returns a generic response; `/auth/reset` accepts a one-time token and a new 12+ character password. A verified new owner has no tenant until onboarding completes atomically. Onboarding creates a 14-day Business trial and neutral, configurable defaults.
+Login returns access/refresh tokens and expiry. `GET /auth/me` returns the authenticated user, resolved tenant and membership. Logout revokes the current session. `/auth/forgot` always returns a generic response; `/auth/reset` accepts a one-time token and a new 12+ character password. A verified new owner has no tenant until onboarding completes atomically. Onboarding creates neutral, configurable defaults and full access without a subscription.
 
 ## Company resources
 
@@ -46,7 +48,7 @@ POST /api/v1/schedules/bulk
 {"copy_from":"2026-10-19"}
 ```
 
-The copy action copies the source seven-day range to the following week, checks conflicts and commits atomically. Bulk scheduling and employee export/import require their configured plan entitlement.
+The copy action copies the source seven-day range to the following week, checks conflicts and commits atomically. Bulk scheduling and employee export/import are available without a plan; their role permissions still apply.
 
 ## Attendance and timesheets
 
@@ -92,8 +94,8 @@ Create `/payroll-periods` with name, start/end and policy ID, optionally branch/
 
 POST `/privacy-requests` with `kind=access|export|anonymize` and reason. Authorized review uses `/privacy-requests/{id}/approve|reject`. The original data subject downloads an approved access/export from `/privacy-requests/{id}/download`.
 
-## Billing and platform administration
+## Full access and platform administration
 
-Company owners use `/subscriptions`, `/plans` and `/billing`. POST `/billing/renew`, `/change-plan` or `/cancel`. Payment requires server verification; clients cannot set `paid`. Super Admin routes begin with `/super`: dashboard, tenant lifecycle/subscription configuration, plans, invoices, payments, settings, audit and health. POST `/super/payments` accepts `invoice_id`, integer `amount` and a unique `reference` for a manually verified payment.
+All accounts have full feature access within their authorized role. No plan, trial renewal, payment or employee cap is required. `/subscriptions` is a compatibility endpoint returning unrestricted access metadata; existing billing history remains readable by authorized operators. Retired company billing mutations return HTTP 410. Super Admin navigation contains dashboard, tenant lifecycle management, settings, audit and health. Existing legacy financial endpoints are retained for historical administration, not as a prerequisite for any feature.
 
 `PATCH /memberships` accepts `id`, `role`, `permissions` and `branch_ids`. Only the company owner may assign roles, and the owner's role cannot be changed through this endpoint. Permissions include `people,schedule,attendance,leave,reports,settings,invite,payroll`; billing stays owner-only.

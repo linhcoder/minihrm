@@ -23,10 +23,11 @@ final class Resources
     public function list(string $r,array $filters): array
     {
         $this->authorize($r); $q=$this->s->query($r);
+        foreach(['from','to'] as $key)if(!empty($filters[$key]))$filters[$key]=DateFormat::date($filters[$key]);
         foreach (['employee_id','branch_id','department_id','status','payroll_period_id','review_status'] as $k) if (isset($filters[$k])&&isset(Schema::RESOURCES[$r][$k])) $q->where($k,$filters[$k]);
         $date=isset(Schema::RESOURCES[$r]['work_date'])?'work_date':(isset(Schema::RESOURCES[$r]['start_date'])?'start_date':'created_at');
-        if (!empty($filters['from'])) $q->where($date.' >=',$filters['from']);
-        if (!empty($filters['to'])) $q->where($date.' <=',$filters['to'].($date==='created_at'?'T23:59:59Z':''));
+        if (!empty($filters['from'])) $q->where($date.' >=',$date==='created_at'?DateFormat::boundary($filters['from']):$filters['from']);
+        if (!empty($filters['to'])) $q->where($date.' <=',$date==='created_at'?DateFormat::boundary($filters['to'],true):$filters['to']);
         $search=$filters['search']??'';
         if ($search!=='') {
             $columns=array_intersect(['name','full_name','code','email','reason'],array_keys(Schema::RESOURCES[$r]));
@@ -95,7 +96,8 @@ final class Resources
                 if ((int)$ts['employee_id']!==(int)$v['employee_id']) throw new Problem(422,'Bảng công không thuộc nhân viên.');
                 $new=json_decode($v['new_values'],true);
                 if (!is_array($new)||array_diff(array_keys($new),['check_in','check_out','reason'])) throw new Problem(422,'Chỉ điều chỉnh giờ vào/ra.');
-                $v['original_values']=json_encode($ts);
+                foreach(['check_in','check_out'] as $key)if(!empty($new[$key]))$new[$key]=DateFormat::instant($new[$key]);
+                $v['new_values']=json_encode($new);$v['original_values']=json_encode($ts);
             }
             if ($r==='payroll-periods') {
                 if ($merged['start_date']>$merged['end_date']) throw new Problem(422,'Ngày kết thúc không hợp lệ.');

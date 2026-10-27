@@ -3,7 +3,7 @@
     "info": {
         "title": "Mini HRM API",
         "version": "1.0.0",
-        "description": "Bearer authentication; tenant resolved from membership. All money uses integer VND. Payroll is a non-statutory estimate. See docs/API.md for workflow payloads."
+        "description": "No commercial plan limits. Human presentation uses dd/MM/yyyy HH:mm:ss (UTC+7); transport remains ISO/UTC. Bearer authentication; tenant resolved from membership. All money uses integer VND. Payroll is a non-statutory estimate. See docs/API.md for workflow payloads."
     },
     "servers": [
         {
@@ -7506,9 +7506,9 @@
                 }
             }
         },
-        "/exports/subscription-usage": {
+        "/exports/platform-usage": {
             "get": {
-                "summary": "Authorized export subscription-usage",
+                "summary": "Authorized export platform-usage",
                 "parameters": [
                     {
                         "in": "query",
@@ -7545,9 +7545,9 @@
                 }
             }
         },
-        "/reports/subscription-usage": {
+        "/reports/platform-usage": {
             "get": {
-                "summary": "subscription-usage",
+                "summary": "platform-usage",
                 "responses": {
                     "200": {
                         "description": "Success"

@@ -1,8 +1,10 @@
 # Architecture
 
+Current behavior: all companies have full feature access without package limits or expiry. Human-facing date/time uses dd/MM/yyyy HH:mm:ss (UTC+7). See [current access/date policy](UNLIMITED-ACCESS-AND-DATES.md).
+
 ## Boundaries
 
-`backend/app/Domain` contains authentication, tenant context, scoped storage, resource validation, subscription enforcement, scheduling, attendance normalization, approvals, payroll, billing, reports, files, privacy and notifications. Controllers translate versioned HTTP requests into these services. The application is a modular monolith; there are no microservices.
+`backend/app/Domain` contains authentication, tenant context, scoped storage, resource validation, an unlimited-access compatibility policy, scheduling, attendance normalization, approvals, payroll, billing, reports, files, privacy and notifications. Controllers translate versioned HTTP requests into these services. The application is a modular monolith; there are no microservices.
 
 `Schema::RESOURCES` defines persistent resource contracts and drives API validation and OpenAPI generation. Specialized services own state transitions. Generic resource updates cannot change attendance events, timesheets, payslips, approval fields, calculated totals or payroll workflow state. `Store` centralizes tenant scoping and audit insertion.
 
@@ -30,7 +32,7 @@ Overnight windows use a local date and IANA timezone, then convert boundaries to
 
 ## Transaction and concurrency model
 
-MySQL tenant row locks serialize employee-limit checks, attendance attempts, schedule assignment, payroll calculation and approvals. Refresh tokens and invoice settlement lock their specific rows. Unique keys protect event UUIDs, employee codes, daily timesheets, payslips, payment references and notification event keys.
+MySQL tenant row locks serialize personnel changes, attendance attempts, schedule assignment, payroll calculation and approvals. Refresh tokens and invoice settlement lock their specific rows. Unique keys protect event UUIDs, employee codes, daily timesheets, payslips, payment references and notification event keys.
 
 Notification enqueue and in-app insertion occur in the business transaction. Redis dispatch hints may survive a rolled-back SQL transaction; workers always verify SQL before delivery. SQL is the durable outbox, Redis supplies dispatch hints, worker leases and a 15-second dashboard cache. Failed delivery uses exponential retry up to five attempts; failures remain visible to platform health. Email/FCM delivery is at least once: a provider can accept a request before the worker observes success. Event identifiers and deterministic email Message-ID support provider-side deduplication where available.
 

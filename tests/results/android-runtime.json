@@ -8,5 +8,7 @@
   "offlineRoomQueue": true,
   "workManagerResync": "pending_verification",
   "coldStartAfterIOFixMs": 5682,
-  "physicalGpsWifiVerified": false
+  "physicalGpsWifiVerified": false,
+  "vietnamDateTimeFormatVerified": true,
+  "vietnamTimezone": "Asia/Ho_Chi_Minh"
 }

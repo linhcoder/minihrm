@@ -18,9 +18,7 @@ final class Onboarding
             $this->db->table('tenants')->insert(['name'=>mb_substr($v['name'],0,255),'business_type'=>$v['business_type'],'timezone'=>$v['timezone'],'working_days'=>json_encode($working),'payroll_day'=>max(1,min(28,(int)($v['payroll_day']??1))),'onboarded'=>1,'status'=>'active','retention_days'=>365,'created_at'=>Store::now()]);$tid=(int)$this->db->insertID();
             $tenant=$this->db->table('tenants')->where('id',$tid)->get()->getRowArray();
             $m=['tenant_id'=>$tid,'user_id'=>$ctx->user['id'],'role'=>'owner','permissions'=>'[]','branch_ids'=>'[]'];$this->db->table('tenant_memberships')->insert($m);
-            $s=new Store($this->db,new Context($ctx->user,$m,$tenant));$plan=$this->db->table('plans')->where('name','Business')->get()->getRowArray();
-            if (!$plan) throw new Problem(503,'Cần chạy seeder gói dịch vụ.');
-            $s->insert('subscriptions',['plan_id'=>$plan['id'],'status'=>'trial','starts_at'=>gmdate('Y-m-d'),'ends_at'=>gmdate('Y-m-d',time()+14*86400)]);
+            $s=new Store($this->db,new Context($ctx->user,$m,$tenant));
             $branch=(new Resources($s))->save('branches',['name'=>$v['branch_name']??'Trụ sở chính','address'=>$v['address']??'','timezone'=>$v['timezone']]);
             $shift=(new Resources($s))->save('shifts',['name'=>'Ca mặc định','start_time'=>$v['start_time']??$preset[0],'end_time'=>$v['end_time']??$preset[1],'break_minutes'=>60,'grace_minutes'=>5,'overtime_eligible'=>1,'working_days'=>$working]);
             $s->insert('salary-policies',['name'=>'Chính sách khởi tạo','effective_from'=>gmdate('Y-01-01'),'standard_days'=>26,'standard_minutes'=>480,'overtime_multiplier_bps'=>10000,'version'=>1,'components'=>'[]']);

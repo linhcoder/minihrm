@@ -57,14 +57,24 @@ final class TenantSecurityTest extends CIUnitTestCase
         $this->denied(fn()=>(new Resources($s))->save('employees',['full_name'=>'Unauthorized'],1),403);
         $this->denied(fn()=>(new Resources($s))->archive('employees',1),403);
     }
-    public function testExpiredPlanPreservesReadsButBlocksWrites():void
+    public function testExpiredLegacyPlanDoesNotBlockFeatures():void
     {
         $this->a->update('subscriptions',1,['ends_at'=>'2020-01-01']);$this->assertCount(1,(new Resources($this->a))->list('employees',[])['data']);
-        $this->denied(fn()=>(new Resources($this->a))->save('departments',['name'=>'Blocked']),402);
+        $this->db->table('plans')->where('id',1)->update(['features'=>'[]','price'=>0,'employee_limit'=>1]);
+        $row=(new Resources($this->a))->save('departments',['name'=>'Được sử dụng đầy đủ']);$this->assertSame('Được sử dụng đầy đủ',$row['name']);
+        $access=(new Subscriptions($this->a))->current();$this->assertFalse($access['read_only']);$this->assertContains('advanced_reports',$access['features']);
     }
-    public function testEmployeeLimitCannotBeBypassed():void
+    public function testLegacyEmployeeCapDoesNotLimitAccounts():void
     {
-        $this->a->update('subscriptions',1,['employee_limit'=>1]);$this->denied(fn()=>(new Resources($this->a))->save('employees',['code'=>'NEW','full_name'=>'New','email'=>'new@test.local','hire_date'=>'2026-01-01']),402);
+        $this->a->update('subscriptions',1,['employee_limit'=>1]);$created=(new Resources($this->a))->save('employees',['code'=>'NEW','full_name'=>'New','email'=>'new@test.local','hire_date'=>'27/10/2026']);
+        $this->assertSame('2026-10-27',$created['hire_date']);$this->assertSame(2,$this->a->query('employees')->countAllResults());
+    }
+    public function testNoSubscriptionRowIsRequiredForPremiumFeatures():void
+    {
+        $this->db->table('subscriptions')->where('tenant_id',1)->delete();
+        $access=(new Subscriptions($this->a))->current();$this->assertFalse($access['read_only']);$this->assertNull($access['employee_limit']);
+        (new Subscriptions($this->a))->writable('payroll');$branch=(new Resources($this->a))->save('branches',['name'=>'Chi nhánh thứ hai']);$this->assertNotEmpty($branch['id']);
+        $policy=(new Resources($this->a))->save('salary-policies',['name'=>'Không cần gói','effective_from'=>'01/01/2026']);$this->assertNotEmpty($policy['id']);
     }
     public function testRefreshIsSingleUseAndLogoutRevokesAccess():void
     {

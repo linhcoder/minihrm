@@ -17,15 +17,14 @@ final class Exports
     public function download(string $resource,array $filters,$response)
     {
         $format=$filters['format']??'xlsx';if (!in_array($format,['xlsx','csv','pdf'])) throw new Problem(422,'Định dạng không hợp lệ.');
-        $this->s->ctx->require('reports');$sub=new Subscriptions($this->s);$current=$sub->current();
-        if (!in_array('export',$current['features'])) throw new Problem(402,'Gói chưa hỗ trợ xuất dữ liệu.');
+        $this->s->ctx->require('reports');
         if (isset(Schema::RESOURCES[$resource])) {
             $first=(new Resources($this->s))->list($resource,[...$filters,'limit'=>200,'page'=>1]);
             if($first['meta']['total']>10000)throw new Problem(422,'Tối đa 10.000 dòng mỗi lần xuất; hãy thu hẹp bộ lọc.');
             $rows=$first['data'];for($page=2;count($rows)<$first['meta']['total'];$page++)$rows=array_merge($rows,(new Resources($this->s))->list($resource,[...$filters,'limit'=>200,'page'=>$page])['data']);
         }
         else $rows=(new Reports($this->s))->run($resource,$filters)['data'];
-        foreach($rows as &$r) { unset($r['inputs'],$r['emergency_contact'],$r['storage_key']);foreach($r as &$v) if (is_array($v)) $v=json_encode($v); }unset($r,$v);
+        foreach($rows as &$r) { unset($r['inputs'],$r['emergency_contact'],$r['storage_key']);foreach($r as &$v) { $v=DateFormat::display($v);if (is_array($v)) $v=json_encode($v,JSON_UNESCAPED_UNICODE); } }unset($r,$v);
         $columns=array_keys($rows[0]??['message'=>'']);$mime='';$body='';
         if ($format==='pdf') {
             $html='<html><meta charset="utf-8"><style>body{font-family:DejaVu Sans;font-size:8px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ddd;padding:4px;word-break:break-all}</style><h1>Mini HRM — '.htmlspecialchars($resource).'</h1><p>Ước tính lương chưa bao gồm đầy đủ nghĩa vụ pháp lý.</p><table><tr>';

@@ -2,15 +2,17 @@
 
 Local verification performed on 27 October 2026 (Asia/Bangkok).
 
+Latest change: [unlimited access and Vietnamese dates](UNLIMITED-ACCESS-AND-DATES.md). Regression checks confirm that missing/expired/Free subscriptions and former employee caps do not restrict operations, while tenant isolation and payroll authorization remain enforced. CSV/XLSX/PDF exports and Vietnamese Excel input were exercised. The updated APK was installed on the API 35 emulator; `27/10/2026 10:57:13` and `08:00:00 – 17:00:00` were observed in the UI. See `tests/results/android-vietnam-dates.png` and `android-date-unit.xml` for current evidence.
+
 | Check | Actual result |
 | --- | --- |
-| PHP 8.3 unit/service suite | 37 tests / 63 assertions passed |
-| HTTP integration, SQLite | 153 checks passed |
-| HTTP integration, MySQL 8.4.3 | Same 153 checks passed against an isolated loopback database |
+| PHP 8.3 unit/service suite | 43 tests / 80 assertions passed |
+| HTTP integration, SQLite | 154 checks passed |
+| HTTP integration, MySQL 8.4.3 | Same 154 checks passed against an isolated loopback database |
 | React TypeScript / Vite production build | Passed |
-| Web authenticated-client tests | 4 passed (session restoration/rotation, revoked refresh, validation errors, invalid-login behavior) |
+| Web client and Vietnamese date tests | 10 passed (authentication, UTC+7 conversion, midnight, date-only values, invalid dates and nested audit presentation) |
 | Android debug APK | Built successfully |
-| Android JVM tests | 4 tests passed, zero failures/errors |
+| Android JVM tests | 9 tests passed, zero failures/errors, including Vietnamese dates and offline payloads |
 | Android lint | Passed with zero errors; dependency-version and SharedPreferences warnings remain |
 | Browser visual/interaction QA | Not run: Browser runtime returned `No browser is available`, discovery returned an empty list |
 | Android emulator runtime (API 35) | APK installed; real employee login, home data, schedule and own profile verified; stopping API queued an offline attempt, restoring API let WorkManager synchronize it as pending verification |

@@ -14,6 +14,7 @@ final class QueueWork extends BaseCommand
             try{$redis->command(['RPOP','hrm:notifications']);}catch(\Throwable){}
             $db->transBegin();$q='SELECT * FROM jobs WHERE completed_at = 0 AND attempts < 5 AND available_at <= ? AND (reserved_at = 0 OR reserved_at < ?) ORDER BY id LIMIT 1';if($db->DBDriver==='MySQLi')$q.=' FOR UPDATE SKIP LOCKED';
             $job=$db->query($q,[$now,$now-300])->getRowArray();if(!$job){$db->transCommit();break;}
+            if(str_starts_with($job['event_key'],'expiry:')){$db->table('jobs')->where('id',$job['id'])->update(['completed_at'=>$now,'reserved_at'=>0,'last_error'=>'Subscription notices retired; full feature access is enabled.']);$db->transCommit();continue;}
             $db->table('jobs')->where('id',$job['id'])->update(['reserved_at'=>$now,'attempts'=>(int)$job['attempts']+1]);$db->transCommit();
             try {
                 $p=json_decode($job['payload'],true,512,JSON_THROW_ON_ERROR);$user=$db->table('users')->where('id',$p['user_id'])->where('active',1)->get()->getRowArray();

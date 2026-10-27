@@ -45,6 +45,7 @@ final class Billing
     {
         $s=$this->s;$s->ctx->require('billing');
         if ($method==='get') return ['invoices'=>$s->query('invoices')->orderBy('id','DESC')->get()->getResultArray(),'payments'=>$s->query('payments')->orderBy('id','DESC')->get()->getResultArray(),'subscription'=>(new Subscriptions($s))->current()];
+        throw new Problem(410,'Tất cả tính năng đã được mở. Không cần đăng ký, gia hạn hoặc thanh toán gói.');
         return $s->transaction(function() use($s,$path,$v) {
             $s->lockTenant();$sub=(new Subscriptions($s))->current();
             if ($path==='cancel') return $s->update('subscriptions',(int)$sub['id'],['cancel_at_end'=>1]);

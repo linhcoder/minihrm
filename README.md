@@ -1,5 +1,7 @@
 # Mini HRM
 
+Current behavior: all companies have full feature access without package limits or expiry. Human-facing date/time uses dd/MM/yyyy HH:mm:ss (UTC+7). See [current access/date policy](docs/UNLIMITED-ACCESS-AND-DATES.md).
+
 Vietnamese multi-tenant attendance and payroll application for small businesses. PHP 8.3 / CodeIgniter 4 API, React / TypeScript web portals, Kotlin / Compose Android client, MySQL 8 production storage, Redis dispatch/cache and a durable SQL notification outbox.
 
 The supplied prompt is preserved in [docs/MASTER-PROMPT.txt](docs/MASTER-PROMPT.txt). It ends mid-list in section 22. Implementation and verification scope are recorded in [docs/IMPLEMENTATION.md](docs/IMPLEMENTATION.md).
@@ -56,7 +58,7 @@ powershell -ExecutionPolicy Bypass -File scripts\build-android.ps1 -Sdk C:\CODE\
 
 On Linux use `php scripts/test-php.php --no-coverage`, `PHP_BINARY=php node tests/api.integration.mjs`, and `cd android && ./gradlew assembleDebug testDebugUnitTest lintDebug`.
 
-The API integration runner creates a disposable database and starts its own server on a random loopback port. It checks tenant boundaries, employee privacy, offline verification, approvals, payroll publication/locking, exports, billing verification, subscription expiry and token rotation. Set `HRM_TEST_MYSQL_DB` to a **disposable database ending in `_test`** to run the same suite against MySQL. Never point this at real company data.
+The API integration runner creates a disposable database and starts its own server on a random loopback port. It checks tenant boundaries, employee privacy, offline verification, approvals, payroll publication/locking, exports, full feature access without subscriptions, Vietnamese date presentation and token rotation. Set `HRM_TEST_MYSQL_DB` to a **disposable database ending in `_test`** to run the same suite against MySQL. Never point this at real company data.
 
 Android debug APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Its development API URL is `http://10.0.2.2:8080/api/v1/` for the Android emulator. A release build requires your HTTPS hostname in `android/app/build.gradle.kts` and your own signing configuration. Debug credentials and cleartext transport must not be used in production.
 

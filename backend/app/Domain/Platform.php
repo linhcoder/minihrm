@@ -9,15 +9,13 @@ final class Platform
         $this->db->table('platform_audit')->insert(['actor_id'=>$this->ctx->user['id'],'action'=>$method.' '.$path,'payload'=>json_encode(array_diff_key($v,['password'=>1])),'created_at'=>Store::now()]);
         $parts=explode('/',$path);$r=$parts[0];$id=(int)($parts[1]??0);$action=$parts[2]??'';
         if ($r==='dashboard') {
-            $subs=$this->db->table('subscriptions')->get()->getResultArray();$mrr=0;$paying=0;$trial=0;$active=0;$cancel=0;
-            foreach($subs as $s) { if ($s['status']==='trial') $trial++;if ($s['cancel_at_end']) $cancel++;if (in_array($s['status'],['active','trial'])&&(!$s['ends_at']||$s['ends_at']>=gmdate('Y-m-d'))) { $active++;$p=$this->db->table('plans')->where('id',$s['plan_id'])->get()->getRowArray();if ($s['status']==='active'&&(int)$p['price']>0) { $paying++;$mrr+=(int)$p['price']; } } }
-            return ['companies'=>$this->db->table('tenants')->countAllResults(),'active'=>$active,'trial'=>$trial,'paying'=>$paying,'mrr'=>$mrr,'cancellations'=>$cancel,'active_users'=>$this->db->table('users')->where('active',1)->countAllResults(),'attendance_events'=>$this->db->table('attendance')->countAllResults(),'pending_jobs'=>$this->db->table('jobs')->where('completed_at',0)->countAllResults()];
+            return ['companies'=>$this->db->table('tenants')->countAllResults(),'active_companies'=>$this->db->table('tenants')->where('status','active')->countAllResults(),'employees'=>$this->db->table('employees')->where('deleted_at',null)->countAllResults(),'active_users'=>$this->db->table('users')->where('active',1)->countAllResults(),'attendance_events'=>$this->db->table('attendance')->countAllResults(),'pending_jobs'=>$this->db->table('jobs')->where('completed_at',0)->countAllResults()];
         }
         if ($r==='health') return ['database'=>$this->db->query('SELECT 1')->getRowArray(),'php'=>PHP_VERSION,'queue_pending'=>$this->db->table('jobs')->where('completed_at',0)->countAllResults(),'failed_jobs'=>$this->db->table('jobs')->where('attempts >=',5)->where('completed_at',0)->countAllResults(),'email_configured'=>(bool)env('email.SMTPHost'),'push_configured'=>(bool)env('HRM_FCM_PROJECT'),'payment_configured'=>(bool)env('HRM_PAYMENT_WEBHOOK_SECRET')];
         if ($r==='audit') return ['data'=>$this->db->table('platform_audit')->orderBy('id','DESC')->limit(200)->get()->getResultArray()];
         if ($r==='tenants'&&$id) {
             $t=$this->db->table('tenants')->where('id',$id)->get()->getRowArray();if (!$t) throw new Problem(404,'Không tìm thấy công ty.');
-            if ($method==='get') return ['tenant'=>$t,'subscription'=>$this->db->table('subscriptions')->where('tenant_id',$id)->get()->getRowArray(),'employees'=>$this->db->table('employees')->where('tenant_id',$id)->where('deleted_at',null)->countAllResults()];
+            if ($method==='get') return ['tenant'=>$t,'employees'=>$this->db->table('employees')->where('tenant_id',$id)->where('deleted_at',null)->countAllResults()];
             if (in_array($action,['suspend','reactivate'])) { $this->db->table('tenants')->where('id',$id)->update(['status'=>$action==='suspend'?'suspended':'active']);return ['saved'=>true]; }
             if ($action==='subscription') {
                 $plan=$this->db->table('plans')->where('id',(int)($v['plan_id']??0))->get()->getRowArray();if (!$plan) throw new Problem(422,'Gói không hợp lệ.');

@@ -1,5 +1,7 @@
 # Deployment and operations
 
+Current behavior: all companies have full feature access without package limits or expiry. Human-facing date/time uses dd/MM/yyyy HH:mm:ss (UTC+7). See [current access/date policy](UNLIMITED-ACCESS-AND-DATES.md).
+
 ## Ubuntu VPS prerequisites
 
 Use a supported Ubuntu release, DNS pointing to the VPS, HTTPS terminated by host Nginx, Docker Engine/Compose, restricted SSH and an off-host encrypted backup destination. The container stack exposes only `127.0.0.1:8088`; MySQL, Redis and PHP-FPM have no host-published ports. MySQL 8.0 is used in Compose/CI. Local verification may also use MySQL 8.4.
@@ -33,7 +35,7 @@ The container worker runs queued notification delivery and auth-mail delivery ev
 15 0 * * * cd /srv/minihrm && docker compose exec -T php php spark hrm:daily >> /var/log/minihrm-daily.log 2>&1
 ```
 
-The daily task sends idempotent expiry/missing-checkout notices, transitions expired subscriptions to read-only, and removes expired location/device evidence. Run it in UTC. Company business dates are interpreted using their saved timezone. Configure log rotation and monitor platform health for pending jobs and failures. Failed jobs remain in the outbox after five attempts; fix the provider configuration and reset `attempts`/`available_at` through an audited operator procedure before retrying.
+The daily task sends idempotent missing-checkout notices, removes expired location/device evidence and preserves unrestricted feature access. Run it in UTC. Company business dates are interpreted using their saved timezone. Configure log rotation and monitor platform health for pending jobs and failures. Failed jobs remain in the outbox after five attempts; fix the provider configuration and reset `attempts`/`available_at` through an audited operator procedure before retrying.
 
 ## Email
 
@@ -43,15 +45,15 @@ Configure `email.protocol=smtp`, SMTP host/user/password/port/TLS, from address 
 
 Firebase is optional until configured. Store a service-account JSON file outside the public root and mount it read-only; set `HRM_FCM_SERVICE_ACCOUNT` to that private path. The backend exchanges a signed service-account assertion for an OAuth token and sends FCM HTTP v1 messages. Register Android device tokens at `POST /api/v1/push-device` after integrating the Firebase Android SDK and your own `google-services.json`. The repository does not contain that project-specific file or claim an active Firebase project. The unconfigured app uses its real in-app notifications screen. Push payloads contain a generic notice and event hash, never payroll details or location.
 
-## Payment provider
+## Legacy payment records (optional)
 
-Manual payment verification is available only to platform administrators and creates an audit entry. The generic signed adapter accepts a **server-to-server** settled notification with an HMAC-SHA256 signature in `X-Signature`, computed over the exact JSON body using `HRM_PAYMENT_WEBHOOK_SECRET` (32+ characters):
+Full feature access does not require any payment provider. The following adapter is retained only for historical invoice reconciliation; the company plan/renewal workflow is disabled. Manual historical payment verification is available only to platform administrators and creates an audit entry. The generic signed adapter accepts a **server-to-server** settled notification with an HMAC-SHA256 signature in `X-Signature`, computed over the exact JSON body using `HRM_PAYMENT_WEBHOOK_SECRET` (32+ characters):
 
 ```json
 {"invoice_id":12,"amount":199000,"status":"settled","reference":"provider-transaction-id","timestamp":1793060000}
 ```
 
-Timestamps must be within five minutes, amounts must match the issued invoice, and provider references are unique. A browser callback never settles an invoice. Adapt the `PaymentProvider` interface to the actual provider's signing/reconciliation contract and test against its sandbox before enabling public billing. Do not send arbitrary client callbacks to this trusted adapter. A paid-plan change remains pending until the payment is verified; Free changes are applied server-side after count-limit validation.
+Timestamps must be within five minutes, amounts must match the issued invoice, and provider references are unique. A browser callback never settles an invoice. Adapt the `PaymentProvider` interface to the actual provider's signing/reconciliation contract and test against its sandbox before enabling public billing. Do not send arbitrary client callbacks to this trusted adapter. Legacy invoice settlement never changes or restricts current feature access.
 
 ## Android release
 

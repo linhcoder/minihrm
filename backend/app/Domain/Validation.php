@@ -24,9 +24,8 @@ final class Validation
             } elseif (in_array($type,['int','money'])) {
                 if (!preg_match('/^\d{1,12}$/',(string)$v)) { $errors[$key]='Phải là số nguyên không âm (tối đa 12 chữ số).'; continue; } $v=(int)$v;
             } elseif ($type==='date') {
-                $d=\DateTimeImmutable::createFromFormat('!Y-m-d',(string)$v);
-                if (!$d||$d->format('Y-m-d')!==$v) { $errors[$key]='Ngày phải có dạng YYYY-MM-DD.'; continue; }
-            } elseif ($type==='time'&&!preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/',(string)$v)) { $errors[$key]='Giờ phải có dạng HH:mm.'; continue;
+                $v=DateFormat::date((string)$v);
+            } elseif ($type==='time') { $v=DateFormat::time((string)$v);
             } elseif ($type==='email'&&!filter_var($v,FILTER_VALIDATE_EMAIL)) { $errors[$key]='Email không hợp lệ.'; continue;
             } elseif ($type==='decimal') {
                 if (!is_numeric($v)) { $errors[$key]='Số không hợp lệ.'; continue; }

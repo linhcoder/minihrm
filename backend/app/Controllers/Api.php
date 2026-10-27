@@ -114,13 +114,13 @@ final class Api extends BaseController
     {
         $s->ctx->require('schedule');(new Subscriptions($s))->writable('advanced_scheduling');
         return $s->transaction(function() use($s,$v) { $s->lockTenant();$rows=$v['rows']??[];
-            if (isset($v['copy_from'])) { $start=$v['copy_from'];$end=(new \DateTimeImmutable($start))->modify('+6 days')->format('Y-m-d');$source=$s->query('schedules')->where('work_date >=',$start)->where('work_date <=',$end)->where('status !=','cancelled')->get()->getResultArray();foreach ($source as $row) $rows[]=['employee_id'=>$row['employee_id'],'branch_id'=>$row['branch_id'],'shift_id'=>$row['shift_id'],'work_date'=>(new \DateTimeImmutable($row['work_date']))->modify('+7 days')->format('Y-m-d')]; }
+            if (isset($v['copy_from'])) { $start=\App\Domain\DateFormat::date($v['copy_from']);$end=(new \DateTimeImmutable($start))->modify('+6 days')->format('Y-m-d');$source=$s->query('schedules')->where('work_date >=',$start)->where('work_date <=',$end)->where('status !=','cancelled')->get()->getResultArray();foreach ($source as $row) $rows[]=['employee_id'=>$row['employee_id'],'branch_id'=>$row['branch_id'],'shift_id'=>$row['shift_id'],'work_date'=>(new \DateTimeImmutable($row['work_date']))->modify('+7 days')->format('Y-m-d')]; }
             if (count($rows)>500) throw new Problem(422,'Tối đa 500 ca mỗi lần.');$out=[];foreach($rows as $row) $out[]=(new Resources($s))->save('schedules',$row);return ['data'=>$out]; });
     }
     private function aggregate(Store $s,array $v): array
     {
         $s->ctx->require('attendance');(new Subscriptions($s))->writable();
-        return $s->transaction(function() use($s,$v) { $s->lockTenant();$from=$v['from']??gmdate('Y-m-d');$to=$v['to']??$from;
+        return $s->transaction(function() use($s,$v) { $s->lockTenant();$from=\App\Domain\DateFormat::date($v['from']??(new \DateTimeImmutable('now',new \DateTimeZone(\App\Domain\DateFormat::TIMEZONE)))->format('Y-m-d'));$to=\App\Domain\DateFormat::date($v['to']??$from);
             if ($from>$to||(new \DateTimeImmutable($from))->diff(new \DateTimeImmutable($to))->days>62) throw new Problem(422,'Tổng hợp tối đa 62 ngày.');
             $rows=$s->query('schedules')->where('work_date >=',$from)->where('work_date <=',$to)->where('status !=','cancelled')->get()->getResultArray();$n=0;
             foreach($rows as $row) { $old=$s->query('timesheets')->where('schedule_id',$row['id'])->get()->getRowArray();if ($old&&$old['review_status']==='approved') continue;$sheet=(new AttendanceEngine($s))->aggregate($row);
