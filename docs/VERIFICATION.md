@@ -32,3 +32,12 @@ Local testing also found and fixed an offline rejection bug: rejected events are
 Before production use, complete the environment-dependent checks in `DEPLOYMENT.md`, visually verify web layouts in an available browser and run Android location/offline flows on physical devices. Passing local service tests is not a substitute for those checks.
 
 The isolated emulator initially needed elevated runtime permission to write its Android feature-cache file. An early cold-start input caused a focused-window timeout under software rendering; repository/network/Keystore initialization was moved off the UI thread and the final APK was rebuilt, installed and rechecked. The final cold launch completed in 5,682 ms and restored its session/home without a new timeout dialog during the recheck. Emulator screenshots are stored in `tests/results/android-home-final.png` and `tests/results/android-offline.png`, with `android-runtime.json` recording the smoke checks. Physical-device startup performance remains a go-live check.
+
+## User guidance update — 27/10/2026
+
+- PHP: 48 tests, 90 assertions passed.
+- Web: 18 tests passed; production TypeScript/Vite build passed.
+- HTTP: 168 checks passed on each isolated SQLite and MySQL database.
+- npm audit: zero vulnerabilities after updating Vitest and removing a circular local package dependency.
+- Help center includes topic/search navigation, illustrated four-step articles, account-scoped reading progress and a role-specific introductory spotlight tour.
+- In-app Browser discovery returned no available browser; visual browser QA remains unverified. DOM interaction tests cover search, image enlargement, read marking, first-visit dismissal persistence and tour replay/navigation.

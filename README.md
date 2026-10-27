@@ -65,3 +65,7 @@ Android debug APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Its deve
 ## Operational boundaries
 
 Payroll is explicitly a **non-statutory estimate**. Effective-dated legal configuration exists, but verified Vietnamese tax/insurance/minimum-wage rules are not supplied. SMTP, Firebase, provider-specific payment credentials, VPS deployment, release signing and physical-device GPS/Wi-Fi validation require environment configuration. No external integration is represented as live merely because its adapter exists.
+
+## Hướng dẫn trong ứng dụng
+
+Vào **Hướng dẫn sử dụng** ở menu hoặc biểu tượng dấu hỏi để tra cứu theo chủ đề, tìm kiếm không dấu, xem hình minh họa và các bước thao tác. Lần đầu vào có tour highlight; có thể bỏ qua hoặc xem lại. Chi tiết triển khai: [docs/USER-GUIDANCE.md](docs/USER-GUIDANCE.md).

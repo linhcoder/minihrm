@@ -21,6 +21,10 @@ final class Api extends BaseController
             if ($path==='billing/webhook'&&$method==='post') return (new \App\Domain\Billing($db))->webhook($this->request->getBody(),$this->request->getHeaderLine('X-Signature'))?$this->json(['accepted'=>true]):$this->json(['accepted'=>false],400);
             $ctx=$auth->context($bearer);
             if ($path==='auth/me'&&$method==='get') return $this->json(['user'=>$ctx->user,'tenant'=>$ctx->tenant,'membership'=>$ctx->membership]);
+            if($path==='me/guidance'){
+                $preferences=new \App\Domain\GuidancePreferences($db,$ctx);
+                return match($method){'get'=>$this->json($preferences->current()),'put'=>$this->json($preferences->save($v)),default=>throw new Problem(405,'Phương thức không được hỗ trợ.')};
+            }
             if ($path==='auth/logout'&&$method==='post') { $auth->logout($bearer);return $this->json(['logged_out'=>true]); }
             if ($path==='onboarding'&&$method==='post') return $this->json((new Onboarding($db))->create($ctx,$v),201);
             if (str_starts_with($path,'super/')) {

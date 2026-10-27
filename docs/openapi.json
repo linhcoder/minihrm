@@ -4168,6 +4168,83 @@
                 }
             }
         },
+        "/me/guidance": {
+            "get": {
+                "summary": "Get own tour preference in current tenant and role",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Object not found within authorized scope"
+                    },
+                    "409": {
+                        "description": "Workflow or duplicate conflict"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "put": {
+                "summary": "Dismiss or complete the introductory tour",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "version",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "version": {
+                                        "type": "integer",
+                                        "enum": [
+                                            1
+                                        ]
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "dismissed",
+                                            "completed"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "401": {
+                        "description": "Authentication required"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Object not found within authorized scope"
+                    },
+                    "409": {
+                        "description": "Workflow or duplicate conflict"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "summary": "auth/login",

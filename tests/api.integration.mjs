@@ -16,6 +16,13 @@ async function login(email){return (await success('auth/login',null,'POST',{emai
 try {
  for(let i=0;i<50;i++){try{await fetch(`http://127.0.0.1:${port}/api/v1/health`);break;}catch{await new Promise(r=>setTimeout(r,100));}}
  owner=await login('owner@minihrm.test');other=await login('other@minihrm.test');employee=await login('employee@minihrm.test');superUser=await login('super@minihrm.test');
+ ok((await req('me/guidance',null)).status===401,'Guidance requires login');
+ ok((await success('me/guidance',owner)).status==='new','First guidance visit');
+ await success('me/guidance',owner,'PUT',{version:1,status:'completed',user_id:999,tenant_id:999});
+ ok((await success('me/guidance',owner)).status==='completed','Completion persists');
+ for(const token of [employee,other,superUser])ok((await success('me/guidance',token)).status==='new','Guidance is isolated per account');
+ ok((await req('me/guidance',owner,'PUT',{version:1,status:'invalid'})).status===422,'Reject invalid guidance status');
+ await success('me/guidance',superUser,'PUT',{version:1,status:'dismissed'});
  const registeredEmail='registered-'+Date.now()+'@company.test';await success('auth/register',null,'POST',{full_name:'Chủ công ty đăng ký mới',email:registeredEmail,password:'MiniHrm!2026Demo'});
  ok((await req('auth/login',null,'POST',{email:registeredEmail,password:'MiniHrm!2026Demo'})).status===403,'Unverified owner cannot log in');
  const mailDir=path.join(root,'backend/writable/mail');const verificationFile=fs.readdirSync(mailDir).map(name=>path.join(mailDir,name)).find(file=>{try{return JSON.parse(fs.readFileSync(file,'utf8')).to===registeredEmail;}catch{return false;}});ok(!!verificationFile,'Verification email is safely spooled without credentials');
