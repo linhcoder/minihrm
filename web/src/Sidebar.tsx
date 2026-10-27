@@ -1,7 +1,7 @@
 import {useEffect,useId,useState,type ReactNode} from 'react';
 import {createPortal} from 'react-dom';
 import {NavLink} from 'react-router-dom';
-import {PanelLeftClose,PanelLeftOpen} from 'lucide-react';
+import {Menu} from 'lucide-react';
 import './sidebar.css';
 
 export function useSidebarCollapsed(){
@@ -12,7 +12,7 @@ export function useSidebarCollapsed(){
 
 export function SidebarToggle({collapsed,onToggle}:{collapsed:boolean;onToggle:()=>void}){
  const title=collapsed?'Mở rộng menu':'Thu gọn menu';
- return <button className="sidebar-toggle" onClick={onToggle} aria-label={title} aria-expanded={!collapsed} title={title}>{collapsed?<PanelLeftOpen size={18}/>:<PanelLeftClose size={18}/>}<span>Thu gọn menu</span></button>;
+ return <button className="sidebar-toggle" onClick={onToggle} aria-label={title} aria-expanded={!collapsed} title={title}><Menu size={19}/></button>;
 }
 
 export function SidebarLink({to,title,collapsed,onClick,children}:{to:string;title:string;collapsed:boolean;onClick:()=>void;children:ReactNode}){

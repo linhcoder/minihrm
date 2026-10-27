@@ -1,0 +1,88 @@
+/* Compact workspace layout, shared by the company and platform portals. */
+.app-shell{background:#f7f9fc;color:#23344e}
+.app-shell .sidebar{width:240px;background:#0f1829;border-right:1px solid #263247}
+.app-shell .sidebar .brand{height:74px;margin:0 12px 14px;padding:0 13px;border-bottom:1px solid #253044;font-size:23px;letter-spacing:-.7px}
+.app-shell .brand-icon{width:25px;height:27px;font-size:23px;border-radius:7px;margin-right:9px}
+.app-shell .brand small{display:none}
+.app-shell .workspace{margin:0 12px 8px;padding:9px 10px;background:#172235;border-color:#253247;border-radius:7px}
+.app-shell .workspace strong{font-size:12px}.app-shell .workspace small{font-size:10px}
+.app-shell .sidebar nav{padding:0 12px 12px}
+.app-shell .nav-group{padding-top:13px}
+.app-shell .nav-group>p{font-size:9px;letter-spacing:.8px;color:#60738f;margin:0 0 8px;padding-left:12px}
+.app-shell .nav-group a{min-height:40px;padding:10px 12px;gap:12px;font-size:13px;font-weight:500;border-radius:8px;margin-bottom:5px;color:#9cadc5}
+.app-shell .nav-group a>svg{color:#6e819b;opacity:1;stroke-width:1.8}
+.app-shell .nav-group a:hover{color:#eef4ff;background:#1b293e}
+.app-shell .nav-group a.active{color:#fff;background:#2563eb;box-shadow:none}
+.app-shell .nav-group a.active>svg{color:#fff}
+.app-shell .sidebar-bottom{font-size:10px;line-height:1.5;margin:10px 22px 17px;padding-top:13px}
+.app-shell .app-content{margin-left:240px}
+.app-shell .topbar{height:64px;padding:0 30px;border-bottom:1px solid #dfe6ef;gap:12px}
+.app-shell .topbar>div{gap:12px;min-width:0}
+.app-shell .topbar strong,.app-shell .topbar .muted{font-size:12px}
+.app-shell .topbar .sidebar-toggle{display:inline-flex;flex-shrink:0;width:34px;height:34px;margin:0 8px 0 -7px;padding:7px;border:0;border-radius:7px;background:transparent;color:#64748b;justify-content:center}
+.app-shell .topbar .sidebar-toggle:hover{background:#eff4fb}
+.app-shell .topbar-right{gap:16px!important}
+.app-shell .topbar-right>a.icon-button{background:#f1f5f9;border-radius:50%;width:36px;height:36px}
+.app-shell .topbar .avatar{background:#2563eb;color:#fff;width:36px;height:36px;font-size:13px}
+.app-shell .user-name strong{font-size:12px;font-weight:600}.app-shell .user-name small{font-size:11px;color:#6c7f9d;margin-top:3px}
+.app-shell .today{display:none}
+.app-shell .page-content{max-width:1920px;padding:30px 30px 18px;min-height:calc(100vh - 111px)}
+.app-shell .page-heading{gap:16px;margin-bottom:22px;align-items:center}
+.app-shell .page-heading .eyebrow{display:none}
+.app-shell .page-heading h1{font-size:25px;line-height:1.3;letter-spacing:-.6px;color:#0f1d34;margin-bottom:5px}
+.app-shell .page-heading .muted{font-size:12px;line-height:1.6;color:#6f819b}
+.app-shell .heading-actions{flex-wrap:wrap;justify-content:flex-end}
+.app-shell button,.app-shell .button{box-shadow:none;font-size:12px;border-radius:7px}
+.app-shell .page-heading button,.app-shell .page-heading .button{padding:9px 13px;font-size:12px}
+.app-shell .primary{box-shadow:none;background:#2563eb!important}
+.app-shell .card{border-color:#e1e7f0;border-radius:10px;box-shadow:0 1px 2px #10213a04;padding:20px;margin-bottom:20px}
+.app-shell .card h2{font-size:16px}.app-shell .card-title p{font-size:12px;line-height:1.5}
+.app-shell .resource-tabs{display:flex;align-items:center;gap:4px;width:fit-content;max-width:100%;padding:4px;margin-bottom:20px;background:#eef2f7;border:1px solid #dfe6ef;border-radius:11px;overflow-x:auto}
+.app-shell .resource-tabs:empty{display:none}
+.app-shell .resource-tabs a{padding:8px 15px;border:0;border-radius:7px;font-size:12px;font-weight:550;white-space:nowrap;color:#607693}
+.app-shell .resource-tabs a.active{background:#fff;color:#2563eb;box-shadow:0 1px 3px #1e3a5f20}
+.app-shell .data-card{padding:0;overflow:hidden}
+.app-shell .table-toolbar{padding:14px 16px;gap:12px;background:#fafbfd;border-bottom:1px solid #e7edf5;flex-wrap:wrap}
+.app-shell .search-field{background:#fff;border-color:#ccd8e8;border-radius:6px;width:300px;max-width:100%;min-width:180px}
+.app-shell .search-field input{font-size:12px;padding:8px 10px}
+.app-shell .filters{gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.app-shell .filters input,.app-shell .filters select{font-size:12px;padding:7px 9px;max-width:150px;min-height:32px;border-color:#d4dfee;border-radius:6px}
+.app-shell .filters button{min-height:32px;padding:6px 10px;font-size:12px;white-space:nowrap}
+.app-shell .filters .clear-filters{color:#47638b;background:#fff}
+.app-shell .table-secondary{padding:12px 16px;flex-wrap:wrap;background:#f5f8ff;border-bottom:1px solid #e5ecf7}
+.app-shell .table-secondary button{font-size:12px;padding:7px 10px}
+.app-shell th{font-size:10px;text-transform:uppercase;letter-spacing:.2px;color:#697e9c;background:#f8fafc;padding:13px 16px;border-top:0;border-bottom:1px solid #d6e0ee}
+.app-shell td{font-size:13px;padding:14px 16px;border-bottom:1px solid #e1e8f2;color:#526983;line-height:1.5}
+.app-shell td strong{font-size:13px;font-weight:600;color:#233e68}
+.app-shell tbody tr:hover{background:#f7faff}
+.app-shell .person{gap:11px}.app-shell .person small{font-size:11px;margin-top:3px;color:#7b8ea9}
+.app-shell .badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600}
+.app-shell .row-actions{gap:7px}
+.app-shell .row-actions .text-button{font-size:11px;border:1px solid #d3deec;background:#fff;border-radius:6px;padding:4px 8px;color:#41618a;line-height:1.2}
+.app-shell .row-actions .text-button:hover{background:#eff5ff;border-color:#9cb9e6}
+.app-shell .pagination{font-size:12px;padding:13px 16px;color:#7386a1}
+.app-shell .pagination button{padding:5px 7px}
+.app-shell .stats-grid{gap:16px;margin-bottom:20px}
+.app-shell .stat-card{position:relative;padding:16px 18px;min-height:119px;border-color:#dfe7f1;border-left:3px solid #3977f6;border-radius:10px;box-shadow:0 1px 2px #10213a08}
+.app-shell .stat-top{font-size:12px;color:#72829a}.app-shell .stat-card>strong{font-size:27px;line-height:1.2;margin-top:2px;color:#142c50}.app-shell .stat-card>small{font-size:11px;line-height:1.4;margin-top:8px;color:#7a8ca5}
+.app-shell .stat-icon{width:30px;height:30px;border-radius:8px}
+.app-shell .review-row{font-size:12px;padding:12px 0}.app-shell .review-row>strong{font-size:11px}
+.app-shell .payroll-note small,.app-shell .payroll-note span{font-size:10px}.app-shell .payroll-note strong{font-size:20px}
+.app-shell .text-link{font-size:12px}.app-shell .quick-actions a{padding:14px}.app-shell .quick-actions strong{font-size:12px}
+.app-shell .workflow-strip{font-size:11px;flex-wrap:wrap;padding:11px 14px;border:1px solid #dce7fa;background:#f0f6ff;border-radius:8px;margin-bottom:18px}
+.app-shell footer{font-size:10px;padding:15px 30px;color:#8696ad}
+@media(min-width:901px){
+ .app-shell.sidebar-collapsed .sidebar{width:70px}
+ .app-shell.sidebar-collapsed .app-content{margin-left:70px}
+ .app-shell.sidebar-collapsed .sidebar .brand{height:74px;margin:0 12px 15px;padding:0;justify-content:center}
+ .app-shell.sidebar-collapsed .brand-icon{margin:0}
+ .app-shell.sidebar-collapsed .workspace{display:none}
+ .app-shell.sidebar-collapsed .sidebar nav{padding:0 12px 12px}
+ .app-shell.sidebar-collapsed .nav-group{padding-top:0}
+ .app-shell.sidebar-collapsed .nav-group+.nav-group{margin-top:12px;padding-top:12px;border-color:#253044}
+ .app-shell.sidebar-collapsed .nav-group a{min-height:40px;padding:10px 0;margin-bottom:8px;border-radius:8px}
+ .app-shell.sidebar-collapsed .sidebar-bottom{font-size:0;margin:10px 21px 17px}
+}
+@media(max-width:1200px){.app-shell .page-content{padding:25px 24px 16px}.app-shell .topbar{padding:0 24px}.app-shell .table-toolbar{align-items:center}.app-shell .filters{flex:1}.app-shell .search-field{width:260px}.app-shell .stat-card{padding:15px}.app-shell .stat-top{font-size:11px}}
+@media(max-width:900px){.app-shell .sidebar{width:240px}.app-shell .app-content{margin-left:0}.app-shell .topbar .sidebar-toggle{display:none}.app-shell .topbar-right{gap:10px!important}.app-shell .page-content{padding:22px 20px 15px}.app-shell .page-heading{align-items:flex-start}.app-shell .table-toolbar{align-items:stretch}.app-shell .search-field{width:100%;max-width:none}.app-shell .filters{justify-content:flex-start}.app-shell .quick-actions strong{font-size:11px}}
+@media(max-width:600px){.app-shell .page-content{padding:20px 14px 12px}.app-shell .topbar{padding:0 14px;height:60px}.app-shell .topbar>div{gap:7px}.app-shell .topbar>div:first-child>strong{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.app-shell .topbar>div:first-child>.lucide-chevron-right{display:none}.app-shell .topbar-right{gap:6px!important}.app-shell .topbar-right>a.icon-button{width:32px;height:32px}.app-shell .topbar .avatar{width:30px;height:30px;font-size:11px}.app-shell .page-heading h1{font-size:22px}.app-shell .heading-actions{justify-content:flex-start;gap:7px}.app-shell .stats-grid{gap:10px}.app-shell .stat-card{padding:12px;min-height:119px}.app-shell .stat-card>strong{font-size:25px}.app-shell .stat-card>small{font-size:10px}.app-shell .stat-top{font-size:11px}.app-shell .stat-icon{width:26px;height:26px}.app-shell .table-toolbar{padding:12px}.app-shell .filters input{max-width:120px}.app-shell .filters select{max-width:155px}.app-shell .card{padding:16px}.app-shell .data-card{padding:0}.app-shell .resource-tabs a{padding:8px 11px}.app-shell td{padding:12px 14px}.app-shell footer{padding:15px 14px}.app-shell .quick-actions a{padding:12px}}
